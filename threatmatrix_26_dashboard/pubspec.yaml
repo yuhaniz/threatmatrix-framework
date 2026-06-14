@@ -1,0 +1,113 @@
+name: threatmatrix_dashboard
+description: "ThreatMatrix: An Adaptive Threat Behavioural Analysis Framework"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Design
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
+
+  # State Management
+  provider: ^6.1.2
+
+  # HTTP & API
+  http: ^1.2.1
+
+  # JSON Serialization
+  json_annotation: ^4.9.0
+
+  # Local Storage
+  shared_preferences: ^2.3.2
+
+  # Date & Time
+  intl: ^0.19.0
+
+  # File Handling
+  file_picker: ^8.0.0+1
+  path_provider: ^2.1.4
+
+  # Charts & Data Visualization
+  fl_chart: ^0.68.0
+
+  # Tables & Data Display
+  data_table_2: ^2.5.12
+
+  # Animations
+  animations: ^2.0.11
+  lottie: ^3.1.2
+
+  # Logging
+  logger: ^2.4.0
+
+  # Security
+  flutter_secure_storage: ^9.2.2
+
+  # PDF Generation
+  pdf: ^3.11.1
+  printing: ^5.13.2
+
+  # CSV
+  csv: ^6.0.0
+
+  # URL Launcher
+  url_launcher: ^6.3.0
+
+  # Loading Indicators
+  shimmer: ^3.0.0
+
+  # Connectivity
+  connectivity_plus: ^6.0.5
+  web_socket_channel: ^3.0.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/fonts/
+
+  fonts:
+    - family: CourierPrime
+      fonts:
+        - asset: assets/fonts/CourierPrime-Regular.ttf
+        - asset: assets/fonts/CourierPrime-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/CourierPrime-Italic.ttf
+          style: italic
+        - asset: assets/fonts/CourierPrime-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-Light.ttf
+          weight: 300
+
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Regular.ttf
+        - asset: assets/fonts/RobotoMono-Bold.ttf
+          weight: 700

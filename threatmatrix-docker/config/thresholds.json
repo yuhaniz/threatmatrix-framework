@@ -1,0 +1,6 @@
+{
+  "low_conf_max":  0.05,
+  "high_conf_min": 0.68,
+  "thr_maha":      20.0,
+  "thr_softmax":   0.56
+}

@@ -1,0 +1,2 @@
+mitreattack-python>=3.0.0
+stix2>=3.0.0

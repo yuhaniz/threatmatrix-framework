@@ -1,0 +1,93 @@
+﻿services:
+
+  ml-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: threatmatrix-ml
+    restart: unless-stopped
+
+    volumes:
+      - type: bind
+        source: ./models/binary
+        target: /app/models/binary
+        read_only: true
+      - type: bind
+        source: ./models/multiclass
+        target: /app/models/multiclass
+        read_only: true
+      - type: bind
+        source: ./models/anomaly
+        target: /app/models/anomaly
+        read_only: true
+      - type: bind
+        source: ./models/metrics.json
+        target: /app/models/metrics.json
+        read_only: true
+      - type: bind
+        source: ./config/thresholds.json
+        target: /app/config/thresholds.json
+        read_only: true
+      - type: bind                              
+        source: ./config/auth.json
+        target: /app/config/auth.json
+      - type: bind
+        source: ./ingest
+        target: /app/ingest
+      - type: bind
+        source: ./app
+        target: /app/app
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - threatmatrix-net
+
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+      - INGEST_DIR=/app/ingest
+      - METRICS_FILE=/app/models/metrics.json
+      - CORS_ORIGINS=https://localhost,http://localhost:8000,https://localhost:8000,http://localhost:8080
+      - AUTH_REQUIRED=${AUTH_REQUIRED:-0}
+      - TM_SESSION_SECRET=ob8VJprZvP0_c2wLcY10xy_tyhW3tESytYB9uXHkGGqNUqsD50YvxwsdLxgUFjm-sSE2tAvxheco2TJ5eGkc1w
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: threatmatrix-caddy
+    restart: unless-stopped
+    profiles: ["https"]
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - type: bind
+        source: ./caddy/Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+      - type: bind
+        source: ./caddy/certs
+        target: /certs
+        read_only: true
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - threatmatrix-net
+    depends_on:
+      - ml-service
+
+networks:
+  threatmatrix-net:
+    driver: bridge
+
+volumes:
+  caddy-data:
+  caddy-config:

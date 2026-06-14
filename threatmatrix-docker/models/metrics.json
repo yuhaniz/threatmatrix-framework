@@ -1,0 +1,34 @@
+{
+  "evaluated_on": "Web-IDS23 test split · Ensemble (RF×0.4 + XGB×0.6) · per-phase feature sets",
+  "phase_1": {
+    "label": "Phase 1 — Binary Detection",
+    "description": "Benign vs Attack gatekeeper (16 features, behaviour-based)",
+    "accuracy":   0.9954,
+    "precision":  0.9956,
+    "recall":     0.9974,
+    "f1_score":   0.9965,
+    "roc_auc":    0.9997,
+    "pr_auc":     0.9998
+  },
+  "phase_2": {
+    "label": "Phase 2 — Severity Classification",
+    "description": "Reconnaissance / Credential_Abuse / Active_Exploitation (14 features, protocol-agnostic)",
+    "accuracy":   0.9993,
+    "precision":  0.9975,
+    "recall":     0.9994,
+    "f1_score":   0.9985,
+    "roc_auc":    1.0000,
+    "pr_auc":     1.0000
+  },
+  "phase_3": {
+    "label": "Phase 3 — RF + Open-Set Recognition",
+    "description": "Fine-grained 6-class + novel detection via Max-Softmax OSR (14 features)",
+    "accuracy":   0.9927,
+    "precision":  0.9893,
+    "recall":     0.9927,
+    "f1_score":   0.9892,
+    "roc_auc":    0.9503,
+    "pr_auc":     0.9182,
+    "note": "ROC-AUC and PR-AUC reflect open-world novel detection (held-out RevShell, SSRF, XSS, SSH), not closed-world classification."
+  }
+}

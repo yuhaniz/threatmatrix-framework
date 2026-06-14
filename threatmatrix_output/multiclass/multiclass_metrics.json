@@ -1,0 +1,244 @@
+{
+    "phase": "multiclass",
+    "scope": "Severity Classification: Reconnaissance / Credential_Abuse / Active_Exploitation",
+    "feature_schema": "behaviour_based_14_protocol_agnostic",
+    "feature_changes": {
+        "removed_features": [
+            "fwd_header_size_tot",
+            "bwd_header_size_tot"
+        ],
+        "removed_reason": "TLS handshake adds ~5-20 bytes to header overhead, creating a systematic HTTP vs HTTPS difference. Protocol fingerprint, not behaviour.",
+        "smote_strategy": {
+            "old": "TARGET_CLASS_COUNT = 200_000 (fixed for all classes)",
+            "new": "match_largest_real (only up-sample minorities to max real count)",
+            "target_per_class_used": 1208787
+        },
+        "recon_cap": {
+            "old": 200000,
+            "new": 100000,
+            "reason": "previously cap of 200K still over-balanced relative to other classes. now cap of 100K maintains balance without artificially trivialising the problem."
+        },
+        "coverage_penalty": {
+            "old": 0.7,
+            "new": 0.5
+        },
+        "zero_var_drop_post_split": [],
+        "optuna_trials": {
+            "rf": 15,
+            "xgb": 25,
+            "old_v2": {
+                "rf": 30,
+                "xgb": 50
+            }
+        },
+        "imputer_leakage": "previously fitted SimpleImputer before train/test split. now fits on train only, transforms test separately."
+    },
+    "n_features": 14,
+    "feature_names": [
+        "flow_duration",
+        "fwd_pkts_tot",
+        "bwd_pkts_tot",
+        "fwd_data_pkts_tot",
+        "bwd_data_pkts_tot",
+        "flow_pkts_per_sec",
+        "fwd_pkts_per_sec",
+        "bwd_pkts_per_sec",
+        "payload_bytes_per_second",
+        "down_up_ratio",
+        "flow_FIN_flag_count",
+        "flow_SYN_flag_count",
+        "flow_RST_flag_count",
+        "flow_ACK_flag_count"
+    ],
+    "classes": [
+        "Reconnaissance",
+        "Credential_Abuse",
+        "Active_Exploitation"
+    ],
+    "class_map": {
+        "0": "Reconnaissance",
+        "1": "Credential_Abuse",
+        "2": "Active_Exploitation"
+    },
+    "n_classes": 3,
+    "withheld_phase3": {
+        "classes": [
+            "revshell_http",
+            "revshell_https",
+            "ssrf_http",
+            "ssrf_https",
+            "xss_http",
+            "xss_https",
+            "ssh_login_successful"
+        ],
+        "reason": "revshell + ssrf: novel unknown for Phase 3 RF + OSR novelty evaluation. xss: Selenium mimics real browser (withheld in Phase 1 too). ssh_login_successful: post-auth signal invisible at flow level."
+    },
+    "label_compression": {
+        "orig_to_comp": {
+            "0": 0,
+            "1": 1,
+            "2": 2
+        },
+        "comp_to_orig": {
+            "0": 0,
+            "1": 1,
+            "2": 2
+        },
+        "n_train_classes": 3,
+        "train_class_names": [
+            "Reconnaissance",
+            "Credential_Abuse",
+            "Active_Exploitation"
+        ]
+    },
+    "protocol_holdout": {
+        "description": "Full ensemble evaluated on HTTP-only and HTTPS-only subsets of the test split. Tests whether removing header_size_tot yielded protocol-agnostic learning.",
+        "pass_threshold_pct": 85.0,
+        "passed": true,
+        "results": [
+            {
+                "tier": "Credential_Abuse",
+                "protocol": "HTTP",
+                "precision": 1.0,
+                "recall": 0.9991249040572185,
+                "f1": 0.9995622604965776,
+                "n": 204549
+            },
+            {
+                "tier": "Credential_Abuse",
+                "protocol": "HTTPS",
+                "precision": 1.0,
+                "recall": 0.999450247388675,
+                "f1": 0.9997250481165796,
+                "n": 150977
+            },
+            {
+                "tier": "Active_Exploitation",
+                "protocol": "HTTP",
+                "precision": 1.0,
+                "recall": 0.9990109931910685,
+                "f1": 0.9995052519409346,
+                "n": 26289
+            },
+            {
+                "tier": "Active_Exploitation",
+                "protocol": "HTTPS",
+                "precision": 1.0,
+                "recall": 0.9991197183098591,
+                "f1": 0.9995596653456627,
+                "n": 9088
+            }
+        ]
+    },
+    "imbalance_policy": {
+        "method": "single_correction_smote_match_largest_real",
+        "best_resampler": "SMOTE",
+        "smote_strategy": "match_largest_real",
+        "smote_target_per_class": 1208787,
+        "recon_cap": 100000
+    },
+    "ensemble_weights": {
+        "rf": 0.4,
+        "xgb": 0.6
+    },
+    "confidence_min": 0.75,
+    "coverage_penalty_alpha": 0.5,
+    "routing_logic": {
+        "CLASSIFIED": "max_prob >= 0.750 \u2192 tier label",
+        "UNCERTAIN": "max_prob < 0.750 \u2192 Phase 3 RF + OSR"
+    },
+    "models": [
+        {
+            "name": "Random Forest",
+            "accuracy": 0.9993356096207621,
+            "precision": 0.9975724630888368,
+            "recall": 0.999608285387178,
+            "f1": 0.9985865408660003,
+            "roc_auc": 0.9999925902042127,
+            "pr_auc": 0.9998815898600912,
+            "Reconnaissance_f1": 0.9999750006249843,
+            "Reconnaissance_recall": 1.0,
+            "Reconnaissance_precision": 0.999950002499875,
+            "Credential_Abuse_f1": 0.9996159316611589,
+            "Credential_Abuse_recall": 0.9992771274112161,
+            "Credential_Abuse_precision": 0.9999549657317365,
+            "Active_Exploitation_f1": 0.9961686903118573,
+            "Active_Exploitation_recall": 0.999547728750318,
+            "Active_Exploitation_precision": 0.9928124210348991
+        },
+        {
+            "name": "XGBoost",
+            "accuracy": 0.9992650333533705,
+            "precision": 0.9974852750638147,
+            "recall": 0.9993944313521873,
+            "f1": 0.9984364839583216,
+            "roc_auc": 0.9999948970266362,
+            "pr_auc": 0.9999639196658195,
+            "Reconnaissance_f1": 0.9999750006249843,
+            "Reconnaissance_recall": 1.0,
+            "Reconnaissance_precision": 0.999950002499875,
+            "Credential_Abuse_f1": 0.9995751421585592,
+            "Credential_Abuse_recall": 0.9992574382745566,
+            "Credential_Abuse_precision": 0.9998930481283422,
+            "Active_Exploitation_f1": 0.9957593090914214,
+            "Active_Exploitation_recall": 0.9989258557820052,
+            "Active_Exploitation_precision": 0.9926127745632268
+        },
+        {
+            "name": "Ensemble (RF + XGB)",
+            "accuracy": 0.9992796353397274,
+            "precision": 0.9975078903914083,
+            "recall": 0.9994339957788664,
+            "f1": 0.9984675135795037,
+            "roc_auc": 0.9999950795861862,
+            "pr_auc": 0.9999622249699117,
+            "Reconnaissance_f1": 0.9999750006249843,
+            "Reconnaissance_recall": 1.0,
+            "Reconnaissance_precision": 0.999950002499875,
+            "Credential_Abuse_f1": 0.9995835818711805,
+            "Credential_Abuse_recall": 0.9992630637421736,
+            "Credential_Abuse_precision": 0.999904305681428,
+            "Active_Exploitation_f1": 0.9958439582423465,
+            "Active_Exploitation_recall": 0.9990389235944258,
+            "Active_Exploitation_precision": 0.9926693629929222
+        }
+    ],
+    "lr_baseline": {
+        "name": "LR Baseline",
+        "accuracy": 0.9965198599182775,
+        "precision": 0.9929919567964142,
+        "recall": 0.9921684376306428,
+        "f1": 0.992579523025816,
+        "roc_auc": 0.9976548995523374,
+        "pr_auc": 0.9934833712223391,
+        "Reconnaissance_f1": 0.9999750006249843,
+        "Reconnaissance_recall": 1.0,
+        "Reconnaissance_precision": 0.999950002499875,
+        "Credential_Abuse_f1": 0.997989178122258,
+        "Credential_Abuse_recall": 0.998129532017349,
+        "Credential_Abuse_precision": 0.9978488636938806,
+        "Active_Exploitation_f1": 0.9797743903302054,
+        "Active_Exploitation_recall": 0.9783757808745795,
+        "Active_Exploitation_precision": 0.981177004195487
+    },
+    "lr_diagnostic_gap_pp": 5.0,
+    "xai_status": {
+        "ran": true,
+        "error": null,
+        "n_samples": 2000
+    },
+    "mitre_nist_mapping": {
+        "_source": "threatmatrix_mitre_nist_mapping.py",
+        "_note": "Import PHASE_2_TIER_MAPPING from threatmatrix_mitre_nist_mapping for enrichment."
+    },
+    "preprocessing_order": [
+        "1. Load CSVs and apply Recon cap",
+        "2. Replace inf/-inf with NaN (no imputation yet)",
+        "3. Stratified time-based 80/20 split \u2192 save split_indices_mc.npz",
+        "4. Carve calibration set (15%) out of training set",
+        "5. Fit imputer on TRAIN only, transform train + calib + test",
+        "6. Drop zero-variance columns (TRAIN-detected) from all sets",
+        "7. Fit scaler on imputed TRAIN, transform calib + test",
+        "8. SMOTE on scaled training data (target = max real class)"
+    ]
+}

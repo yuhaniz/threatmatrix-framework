@@ -80,7 +80,8 @@ The dataset includes 82 flow-level features, which capture various aspects of ne
 ## Citation
 If you use this dataset in your research, please cite the following paper:
 ```
-TBF
+Lanfer, E., Brockmann, D., & Aschenbruck, N. (2025). WEB-IDS23 dataset 
+[Dataset]. https://doi.org/10.26249/FK2/MOCIY8
 ```
 
 ## License
